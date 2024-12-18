@@ -30,7 +30,7 @@ app.get('/musica/:id',(req,res)=>{
 app.post('/musica',(req,res)=>{
     const {id,nome} = req.body;
 
-    if (!id || !nome{
+    if (!id || !nome){
         res.status(400).json({message: 'Preencha todos os campos'});
     }
     
@@ -42,5 +42,29 @@ app.put('/musica/:id',(req,res)=>{
     const id = parseInt(req.params.id);
     const {nome} = req.body;
 
-    const musica = musicas.find(musica => musica.id === id);
+    const index = musicas.find(musica => musica.id === id);
+
+    if (index !== -1){
+        musicas[index].nome = nome;
+
+        res.json({message: 'Musica atualizada com sucesso',musica: musicas[indexe]})
+    }else{
+        res.status(404).json({message: 'Musica não encontrada'});
+    }
+});
+
+app.delete('/pessoa/:id',(req,res)=>{
+    const id = parseInt(req.params.id);
+    const index = musicas.findIndex(musica => musica.id === id);
+
+    if(index !== -1){
+        musicas.splice(index,1);
+        res.json({message: 'Musica removida com sucesso'});
+    }else{
+        res.status(404).json({message: 'Musica não encontrada'});
+    }
+});
+
+app.listen(port,()=>{
+    console.log(`Servidor rodando na porta ${port}`);
 });
