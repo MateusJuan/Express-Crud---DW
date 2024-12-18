@@ -11,12 +11,19 @@ app.use(express.static(path.join(__dirname)));
 let musicas = [];
 let nextId = 1;
 
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
+app.get('/musica', (res) => {
+    res.json(musicas);
 });
 
-app.get('/musica', (req, res) => {
-    res.json(musicas);
+app.get('/musica/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    const musica = musicas.find(m => m.id === id);
+
+    if (musica) {
+        res.json(musica);
+    } else {
+        res.status(404).json({ message: 'Música não encontrada' });
+    }
 });
 
 app.post('/musica', (req, res) => {
@@ -35,7 +42,7 @@ app.put('/musica/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const { nome } = req.body;
 
-    const index = musicas.findIndex(musica => musica.id === id);
+    const index = musicas.findIndex(m => m.id === id);
 
     if (index !== -1) {
         musicas[index].nome = nome;
@@ -47,7 +54,7 @@ app.put('/musica/:id', (req, res) => {
 
 app.delete('/musica/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const index = musicas.findIndex(musica => musica.id === id);
+    const index = musicas.findIndex(m => m.id === id);
 
     if (index !== -1) {
         musicas.splice(index, 1);
@@ -55,6 +62,10 @@ app.delete('/musica/:id', (req, res) => {
     } else {
         res.status(404).json({ message: 'Música não encontrada' });
     }
+});
+
+app.get('/', (res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 app.listen(port, () => {
