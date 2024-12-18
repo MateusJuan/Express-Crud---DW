@@ -1,70 +1,99 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const apiUrl = 'http://localhost:3000/musica';
+const tabelaMusicas = document.querySelector('#tabelaMusicas tbody');
+const mensagem = document.getElementById('mensagem');
 
-const app = express();
-const port = 3000;
+function exibirMensagem(texto, tipo) {
+    mensagem.textContent = texto;
+    mensagem.className = tipo;
+    setTimeout(() => mensagem.textContent = '', 3000);
+}
 
-app.use (bodyParser.json());
+async function carregarMusicas() {
+    try {
+        const resposta = await fetch(apiUrl);
+        const musicas = await resposta.json();
+        tabelaMusicas.innerHTML = '';
+        musicas.forEach(musica => {
+            const linha = document.createElement('tr');
+            linha.innerHTML = `
+                <td>${musica.id}</td>
+                <td>${musica.nome}</td>
+            `;
+            tabelaMusicas.appendChild(linha);
+        });
+    } catch (erro) {
+        exibirMensagem('Erro ao carregar músicas', 'error');
+    }
+}
 
-let musicas = [
-    {id : 1, nome: 'Hino Nacional Brasileiro'},
-    {id : 2, nome: 'Cancão do xpedicionáirio'},
-    {id : 3, nome: 'Dobrado Baptista de Melo'}
-];
+document.getElementById('formMusica').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('id').value;
+    const nome = document.getElementById('nome').value;
 
-app.get('/musica',(res)=>{
-    res.json(musicas);
-});
+    try {
+        const resposta = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: parseInt(id), nome })
+        });
 
-app.get('/musica/:id',(req,res)=>{
-    const id = parseInt(req.params.id);
-    const musica = musicas.find(musica => musica.id === id);
-
-    if (musica){
-        res.json(musica);
-    }else{
-        res.status(404).json({message: 'Musica não encontrada'});
+        const resultado = await resposta.json();
+        if (resposta.ok) {
+            exibirMensagem(resultado.message, 'success');
+            carregarMusicas();
+        } else {
+            exibirMensagem(resultado.message, 'error');
+        }
+    } catch (erro) {
+        exibirMensagem('Erro ao adicionar música', 'error');
     }
 });
 
-app.post('/musica',(req,res)=>{
-    const {id,nome} = req.body;
+document.getElementById('formAtualizar').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('atualizarId').value;
+    const nome = document.getElementById('novoNome').value;
 
-    if (!id || !nome){
-        res.status(400).json({message: 'Preencha todos os campos'});
-    }
-    
-    musica.push({id,nome});
-    res.status(201).json({message:'Musica Adiconada com sucesso',musica:{id,nome}});
-});
+    try {
+        const resposta = await fetch(`${apiUrl}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ nome })
+        });
 
-app.put('/musica/:id',(req,res)=>{
-    const id = parseInt(req.params.id);
-    const {nome} = req.body;
-
-    const index = musicas.find(musica => musica.id === id);
-
-    if (index !== -1){
-        musicas[index].nome = nome;
-
-        res.json({message: 'Musica atualizada com sucesso',musica: musicas[indexe]})
-    }else{
-        res.status(404).json({message: 'Musica não encontrada'});
+        const resultado = await resposta.json();
+        if (resposta.ok) {
+            exibirMensagem(resultado.message, 'success');
+            carregarMusicas();
+        } else {
+            exibirMensagem(resultado.message, 'error');
+        }
+    } catch (erro) {
+        exibirMensagem('Erro ao atualizar música', 'error');
     }
 });
 
-app.delete('/pessoa/:id',(req,res)=>{
-    const id = parseInt(req.params.id);
-    const index = musicas.findIndex(musica => musica.id === id);
+document.getElementById('formDeletar').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('deletarId').value;
 
-    if(index !== -1){
-        musicas.splice(index,1);
-        res.json({message: 'Musica removida com sucesso'});
-    }else{
-        res.status(404).json({message: 'Musica não encontrada'});
+    try {
+        const resposta = await fetch(`${apiUrl}/${id}`, {
+            method: 'DELETE'
+        });
+
+        const resultado = await resposta.json();
+        if (resposta.ok) {
+            exibirMensagem(resultado.message, 'success');
+            carregarMusicas();
+        } else {
+            exibirMensagem(resultado.message, 'error');
+        }
+    } catch (erro) {
+        exibirMensagem('Erro ao deletar música', 'error');
     }
 });
 
-app.listen(port,()=>{
-    console.log(`Servidor rodando na porta ${port}`);
-});
+// Carregar as músicas ao carregar a página
+carregarMusicas();
