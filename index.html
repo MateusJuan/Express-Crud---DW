@@ -9,13 +9,14 @@
 <body>
     <h1>Gerenciador de Músicas</h1>
 
+    <!-- Formulário para Adicionar Música -->
     <form id="formMusica">
         <h3>Adicionar Música</h3>
-        <input type="number" id="id" placeholder="ID" required>
         <input type="text" id="nome" placeholder="Nome da Música" required>
         <button type="submit">Adicionar Música</button>
     </form>
 
+    <!-- Formulário para Atualizar Música -->
     <form id="formAtualizar">
         <h3>Atualizar Música</h3>
         <input type="number" id="atualizarId" placeholder="ID da Música" required>
@@ -23,12 +24,14 @@
         <button type="submit">Atualizar Música</button>
     </form>
 
+    <!-- Formulário para Deletar Música -->
     <form id="formDeletar">
         <h3>Deletar Música</h3>
         <input type="number" id="deletarId" placeholder="ID da Música" required>
         <button type="submit">Deletar Música</button>
     </form>
 
+    <!-- Lista de Músicas -->
     <h3>Lista de Músicas</h3>
     <table id="tabelaMusicas">
         <thead>
@@ -40,8 +43,8 @@
         <tbody></tbody>
     </table>
 
-    <p id="mensagem" class="success"></p>
+    <p id="mensagem"></p>
 
-    <script src="script.js"></script>
+    <script src="apps.js"></script> <!-- Script Frontend -->
 </body>
 </html>

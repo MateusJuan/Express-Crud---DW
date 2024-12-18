@@ -1,73 +1,62 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 const app = express();
 const port = 3000;
 
-app.use (bodyParser.json());
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname)));
 
-let musicas = [
-    {id : 1, nome: 'Hino Nacional Brasileiro'},
-    {id : 2, nome: 'Cancão do xpedicionáirio'},
-    {id : 3, nome: 'Dobrado Baptista de Melo'}
-];
+let musicas = [];
+let nextId = 1;
 
-app.get('/musica',(res)=>{
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.get('/musica', (req, res) => {
     res.json(musicas);
 });
 
-app.get('/musica/:id',(req,res)=>{
-    const id = parseInt(req.params.id);
-    const musica = musicas.find(musica => musica.id === id);
+app.post('/musica', (req, res) => {
+    const { nome } = req.body;
 
-    if (musica){
-        res.json(musica);
-    }else{
-        res.status(404).json({message: 'Musica não encontrada'});
+    if (!nome) {
+        return res.status(400).json({ message: 'Preencha o nome da música' });
     }
+
+    const musica = { id: nextId++, nome };
+    musicas.push(musica);
+    res.status(201).json({ message: 'Música adicionada com sucesso', musica });
 });
 
-app.post('/musica',(req,res)=>{
-    const {id,nome} = req.body;
-
-    if (!id || !nome){
-        res.status(400).json({message: 'Preencha todos os campos'});
-    }
-    
-    musica.push({id,nome});
-    res.status(201).json({message:'Musica Adiconada com sucesso',musica:{id,nome}});
-});
-
-app.put('/musica/:id',(req,res)=>{
+app.put('/musica/:id', (req, res) => {
     const id = parseInt(req.params.id);
-    const {nome} = req.body;
+    const { nome } = req.body;
 
-    const index = musicas.find(musica => musica.id === id);
+    const index = musicas.findIndex(musica => musica.id === id);
 
-    if (index !== -1){
+    if (index !== -1) {
         musicas[index].nome = nome;
-
-        res.json({message: 'Musica atualizada com sucesso',musica: musicas[indexe]})
-    }else{
-        res.status(404).json({message: 'Musica não encontrada'});
+        res.json({ message: 'Música atualizada com sucesso', musica: musicas[index] });
+    } else {
+        res.status(404).json({ message: 'Música não encontrada' });
     }
 });
 
-app.delete('/pessoa/:id',(req,res)=>{
+app.delete('/musica/:id', (req, res) => {
     const id = parseInt(req.params.id);
     const index = musicas.findIndex(musica => musica.id === id);
 
-    if(index !== -1){
-        musicas.splice(index,1);
-        res.json({message: 'Musica removida com sucesso'});
-    }else{
-        res.status(404).json({message: 'Musica não encontrada'});
+    if (index !== -1) {
+        musicas.splice(index, 1);
+        res.json({ message: 'Música removida com sucesso' });
+    } else {
+        res.status(404).json({ message: 'Música não encontrada' });
     }
 });
 
-app.listen(port,()=>{
+app.listen(port, () => {
     console.log(`Servidor rodando na porta ${port}`);
 });
-
-
-Quero pedir ao usuário as informações 
