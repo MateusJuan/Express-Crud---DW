@@ -7,9 +7,9 @@ const port = 3000;
 app.use (bodyParser.json());
 
 let pessoas = [
-    {id : 1, nome: 'João', idade: 25},
-    {id : 2, nome: 'Maria', idade: 30},
-    {id : 3, nome: 'Pedro', idade: 35}
+    {id : 1, nome: 'Mateus', idade: 16},
+    {id : 2, nome: 'Eliel', idade: 16},
+    {id : 3, nome: 'João', idade: 35}
 ];
 
 app.get('/pessoa',(res)=>{
